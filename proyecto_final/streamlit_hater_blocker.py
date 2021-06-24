@@ -1,4 +1,7 @@
+import time
+
 import streamlit as st
+import time
 import pandas as pd
 from spacy import displacy
 import spacy
@@ -63,6 +66,7 @@ users_url = []
 tweets_url = []
 usuario = []
 texto = []
+count = 0
 
 if st.button('Comenzar análisis de menciones.'):
 
@@ -70,7 +74,10 @@ if st.button('Comenzar análisis de menciones.'):
 
     mentions = api.mentions_timeline(tweet_mode= 'extented')
 
+
     for tweet in mentions: # Entran los tweets
+
+        count += 1
 
         users.append(tweet.user)
 
@@ -78,7 +85,8 @@ if st.button('Comenzar análisis de menciones.'):
 
             print(' ')
 
-        clf = modelo()
+        filename = '/Users/alexmendezsomoza/Desktop/Ironhack/Proyecto-Final/proyecto_final/modeloNLP_Twitter'
+        clf = pickle.load(open(filename, 'rb'))
 
         valoracion = clf.predict([tweet.text])
 
@@ -95,31 +103,39 @@ if st.button('Comenzar análisis de menciones.'):
 
             st.write('Voy a bloquear a ', tweet.user.screen_name, 'por el siguiente tweet:', tweet.text )
 
-            verif = st.text_input("¿Deseas bloquear a este usuario?")
+            answers = ['Si','No','Para']
 
-            if verif == 'Si': # Si
+            verif = st.selectbox('¿Qué hacemos?', ['Selecciona opción.'] + answers, key=count)
 
-                api.create_block(tweet.user.screen_name)
+            if verif not in answers:
 
-                insert(tweet, i, 0) # Metelo en sql los tweets con etiqueta 0 para entrenar.
+                time.sleep(0.1)
 
-                bullies_to_sql(tweet, i) # Metelo en el listado de bullies para enseñarlo al cliente.
+            else:
 
-                st.write('Bloqueado. Guardado para entrenar.')
+                if verif == 'Si': # Si
 
-                st.write('Guardado para enviar a cliente. ')
+                    st.write('Bloqueado. Guardado para entrenar.')
 
-                usuario.append(i.name)
+                    st.write('Guardado para enviar a cliente. ')
 
-                texto.append(tweet.text)
+                    api.create_block(tweet.user.screen_name)
+
+                    insert(tweet, i, 0) # Metelo en sql los tweets con etiqueta 0 para entrenar.
+
+                    bullies_to_sql(tweet, i) # Metelo en el listado de bullies para enseñarlo al cliente.
+
+                    usuario.append(i.name)
+
+                    texto.append(tweet.text)
 
 
-            elif verif == 'No': # No
+                elif verif == 'No': # No
 
-                insert(tweet, i, 1) # Mete en sql los tweets con etiqueta 1 para entrenar.
+                    insert(tweet, i, 1) # Mete en sql los tweets con etiqueta 1 para entrenar.
 
-                st.write ('Usuario no bloqueado. Guardado para entrenar')
+                    st.write ('Usuario no bloqueado. Guardado para entrenar')
 
-            elif verif == 'Para': # Para
+                elif verif == 'Para': # Para
 
-                break
+                    break
