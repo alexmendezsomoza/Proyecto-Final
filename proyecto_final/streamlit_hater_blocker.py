@@ -1,5 +1,4 @@
 import time
-
 import streamlit as st
 import time
 import pandas as pd
@@ -50,10 +49,15 @@ if st.button('Enviar a mi correo'):
 
 # 4 authentication chains
 
-consumer_key = 'Qbxaw0OrPeZSFljKEp6SHI19M'
-consumer_secret = 'kva4UfB6cK2Z6P70MGV8LAM0MMOu3SAHjuUl5t7bWxpegkCHGl'
-access_key = '902474996-eLIpuPP1uqYZoTWtprZuiL2FmehUURAZHT8ZBReU'
-access_secret = 'CkVPZlMz5Lk4EMYDZzmNM2zJQHGE0ze6CA0auHqnYtEhU'
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+consumer_key = os.getenv("consumer_key")
+consumer_secret = os.getenv("consumer_secret")
+access_key = os.getenv("access_key")
+access_secret = os.getenv("access_secret")
 
 # authorize twitter, initialize tweepy
 
